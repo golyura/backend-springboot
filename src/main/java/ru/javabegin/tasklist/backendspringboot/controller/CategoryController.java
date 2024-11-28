@@ -7,11 +7,12 @@ import ru.javabegin.tasklist.backendspringboot.entity.Category;
 import ru.javabegin.tasklist.backendspringboot.repo.CategoryRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 // используем @RestController вместо обычного @Controller, чтобы все ответы сразу оборачивались в JSON
 // иначе пришлось бы выполнять лишнюю работу, использовать @ResponseBody для ответа, указывать тип отправки JSON
 @RestController
-@RequestMapping ("/category") // базовый адрес
+@RequestMapping("/category") // базовый адрес
 public class CategoryController {
 
     // доступ к данным из БД
@@ -24,19 +25,16 @@ public class CategoryController {
     }
 
 
-    // для тестирования адрес: http://localhost:8080/category/test
-    @GetMapping("/test")
-    public List<Category> test() {
+    @GetMapping("/all")
+    public List<Category> findAll() {
 
-        List<Category> list = categoryRepository.findAll();
+        return categoryRepository.findAllByOrderByTitleAsc();
 
-
-        return list; // JSON формат будет использоваться автоматически
-        
     }
 
+
     @PostMapping("/add")
-    public ResponseEntity<Category> add(@RequestBody Category category){
+    public ResponseEntity<Category> add(@RequestBody Category category) {
 
         // проверка на обязательные параметры
         if (category.getId() != null && category.getId() != 0) {
@@ -54,7 +52,7 @@ public class CategoryController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Category> update(@RequestBody Category category){
+    public ResponseEntity<Category> update(@RequestBody Category category) {
 
         // проверка на обязательные параметры
         if (category.getId() == null || category.getId() == 0) {
@@ -68,7 +66,36 @@ public class CategoryController {
 
         // save работает как на добавление, так и на обновление
         return ResponseEntity.ok(categoryRepository.save(category));
+    }
 
+    // параметр id передаются не в BODY запроса, а в самом URL
+    @GetMapping("/id/{id}")
+    public ResponseEntity<Category> findById(@PathVariable Long id) {
+
+        Category category = null;
+
+        // можно обойтись и без try-catch, тогда будет возвращаться полная ошибка (stacktrace)
+        // здесь показан пример, как можно обрабатывать исключение и отправлять свой текст/статус
+        try {
+            category = categoryRepository.findById(id).get();
+        } catch (NoSuchElementException e) { // если объект не будет найден
+            e.printStackTrace();
+            return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        return ResponseEntity.ok(category);
+    }
+
+
+    // параметр id передаются не в BODY запроса, а в самом URL
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity delete(@PathVariable Long id) {
+        var categoryResponse = findById(id);
+        if (categoryResponse.getStatusCode().is2xxSuccessful()) {
+            categoryRepository.deleteById(id);
+            return new ResponseEntity(HttpStatus.OK); // не возвращаем удаленный объект
+        }
+        return categoryResponse;
     }
 
 
