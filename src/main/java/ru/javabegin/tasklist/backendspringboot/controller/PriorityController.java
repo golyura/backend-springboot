@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.javabegin.tasklist.backendspringboot.entity.Priority;
 import ru.javabegin.tasklist.backendspringboot.repo.PriorityRepository;
+import ru.javabegin.tasklist.backendspringboot.search.PrioritySearchValues;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -109,6 +110,14 @@ public class PriorityController {
             return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
         }
         return new ResponseEntity(HttpStatus.OK); // не возвращаем удаленный объект
+    }
+
+    // поиск по любым параметрам CategorySearchValues
+    @PostMapping("/search")
+    public ResponseEntity<List<Priority>> search(@RequestBody PrioritySearchValues prioritySearchValues){
+
+        // если вместо текста будет пусто или null - вернутся все категории
+        return ResponseEntity.ok(priorityRepository.findByTitle(prioritySearchValues.getText()));
     }
 
 
