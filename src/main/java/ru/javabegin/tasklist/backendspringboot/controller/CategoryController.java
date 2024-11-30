@@ -16,6 +16,7 @@ import java.util.NoSuchElementException;
 // используем @RestController вместо обычного @Controller, чтобы все ответы сразу оборачивались в JSON
 // иначе пришлось бы выполнять лишнюю работу, использовать @ResponseBody для ответа, указывать тип отправки JSON
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/category") // базовый адрес
 public class CategoryController {
 

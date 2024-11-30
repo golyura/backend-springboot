@@ -1,6 +1,7 @@
 package ru.javabegin.tasklist.backendspringboot.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.javabegin.tasklist.backendspringboot.entity.Stat;
@@ -15,6 +16,7 @@ import ru.javabegin.tasklist.backendspringboot.util.MyLogger;
 // иначе пришлось бы выполнять лишнюю работу, использовать @ResponseBody для ответа, указывать тип отправки JSON
 // Названия методов могут быть любыми, главное не дублировать их имена и URL mapping
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 public class StatController {
 
     private final StatService statService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
