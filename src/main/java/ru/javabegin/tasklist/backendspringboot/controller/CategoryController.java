@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.tasklist.backendspringboot.entity.Category;
 import ru.javabegin.tasklist.backendspringboot.repo.CategoryRepository;
 import ru.javabegin.tasklist.backendspringboot.search.CategorySearchValues;
+import ru.javabegin.tasklist.backendspringboot.service.CategoryService;
 import ru.javabegin.tasklist.backendspringboot.util.MyLogger;
 
 import java.util.List;
@@ -19,12 +20,12 @@ import java.util.NoSuchElementException;
 public class CategoryController {
 
     // доступ к данным из БД
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
     // автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public CategoryController(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
 
@@ -32,7 +33,7 @@ public class CategoryController {
     public List<Category> findAll() {
 
         MyLogger.showMethodName("CategoryController: findAll() ---------------------------------------------------------- ");
-        return categoryRepository.findAllByOrderByTitleAsc();
+        return categoryService.findAllByOrderByTitleAsc();
     }
 
 
@@ -55,7 +56,7 @@ public class CategoryController {
         }
 
 
-        return ResponseEntity.ok(categoryRepository.save(category));
+        return ResponseEntity.ok(categoryService.add(category));
     }
 
     @PutMapping("/update")
@@ -75,7 +76,7 @@ public class CategoryController {
         }
 
         // save работает как на добавление, так и на обновление
-        return ResponseEntity.ok(categoryRepository.save(category));
+        return ResponseEntity.ok(categoryService.update(category));
 
     }
 
@@ -91,7 +92,7 @@ public class CategoryController {
         // можно обойтись и без try-catch, тогда будет возвращаться полная ошибка (stacktrace)
         // здесь показан пример, как можно обрабатывать исключение и отправлять свой текст/статус
         try{
-            category = categoryRepository.findById(id).get();
+            category = categoryService.findById(id);
         }catch (NoSuchElementException e){ // если объект не будет найден
             e.printStackTrace();
             return new ResponseEntity("id="+id+" not found", HttpStatus.NOT_ACCEPTABLE);
@@ -111,7 +112,7 @@ public class CategoryController {
         // можно обойтись и без try-catch, тогда будет возвращаться полная ошибка (stacktrace)
         // здесь показан пример, как можно обрабатывать исключение и отправлять свой текст/статус
         try {
-            categoryRepository.deleteById(id);
+            categoryService.deleteById(id);
         }catch (EmptyResultDataAccessException e){
             e.printStackTrace();
             return new ResponseEntity("id="+id+" not found", HttpStatus.NOT_ACCEPTABLE);
@@ -127,7 +128,7 @@ public class CategoryController {
 
 
         // если вместо текста будет пусто или null - вернутся все категории
-        return ResponseEntity.ok(categoryRepository.findByTitle(categorySearchValues.getText()));
+        return ResponseEntity.ok(categoryService.findByTitle(categorySearchValues.getText()));
     }
 
 
