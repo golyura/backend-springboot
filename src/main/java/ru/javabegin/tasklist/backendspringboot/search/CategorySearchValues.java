@@ -13,6 +13,6 @@ import lombok.Setter;
 // возможные значения, по которым можно искать категории
 public class CategorySearchValues {
 
-    private String text;
+    private String title;
 
 }

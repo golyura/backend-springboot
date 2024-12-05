@@ -13,6 +13,6 @@ import lombok.Setter;
 // возможные значения, по которым можно искать приоритеты
 public class PrioritySearchValues {
 
-    private String text;
+    private String title;
 
 }
